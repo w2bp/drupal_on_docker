@@ -1,0 +1,50 @@
+# Compose fileのバージョン指定
+version: '3'
+
+# どんなコンテナを立ち上げるか
+services:
+# ----------------------------------
+# Drupalを動かすコンテナ
+# ----------------------------------
+  my-drupal9:
+    depends_on:
+      - mysql-drupal
+    image: drupal
+    container_name: my-drupal9
+    ports:
+      - 8086:80
+    volumes:
+      - ./html:/var/www/html
+
+
+# ----------------------------------
+# MySQLを動かすコンテナ
+# ----------------------------------
+  mysql-drupal:
+    image: mysql
+    container_name: mysql-drupal
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpass
+      - MYSQL_DATABASE=drupal9
+      - MYSQL_USER=myuser
+      - MYSQL_PASSWORD=mypass
+    volumes:
+      - ./db/data:/var/lib/mysql
+      - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
+
+
+# ----------------------------------
+# phpMyAdminを動かすコンテナ
+# ----------------------------------
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=mysql-drupal
+      - PMA_USER=myuser
+      - PMA_PASSWORD=mypass
+    ports:
+      - 8087:80
+    volumes:
+      - ./phpmyadmin/sessions:/sessions
